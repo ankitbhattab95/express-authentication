@@ -1,7 +1,8 @@
-NodeJS POC 2  – Authentication
+2.
+Start reading on Node Express and set up a sample app having the below –
 
-Build a small login app, which will store the login info (persist the login so that the user does not have to login again 
+You can setup sample routes. /home, /details .. add a middleware function which will get the current time store it in the request and pass it to the next route using “next()”
 
-You can use JWT token-based authentication or local Storage using node.
 
-If the user comes back to the login page, it would redirect to home/details page.
+run command: node index.js
+run on localhost port 3000
