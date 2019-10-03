@@ -1,5 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser')
+var jwt = require('jsonwebtoken')
 const fs=require('fs')
 var app= express();
 var userDB= [];
@@ -31,6 +32,21 @@ app.get('/', function(req, res) {
     })
 } )
 
+app.get("/login.js",function(req,res){
+    if(req.url.match("\.js$")){
+        var fileStream= fs.createReadStream("\login.js")
+        res.writeHead(200,{'Content-type':'application/javascript'})
+        fileStream.pipe(res);
+    } 
+})
+app.get("/home.js",function(req,res){
+    if(req.url.match("\.js$")){
+        var fileStream= fs.createReadStream("\home.js")
+        res.writeHead(200,{'Content-type':'application/javascript'})
+        fileStream.pipe(res);
+    } 
+})
+
 app.get('/login',function(req,res){
     res.writeHead(200,{'Content-type':'text/html'})
     fs.readFile('login.html',function(error,data){
@@ -39,9 +55,25 @@ app.get('/login',function(req,res){
         res.write('file not found')
     }
     else{
+        console.log("get request")
         res.write(data)
     }
     res.end();
+    })
+})
+
+app.post('/login',function(req,res){
+    userDetails={
+        user:req.body.user,
+        password:req.body.password
+    }
+    jwt.sign({userDetails},'secretKey',function(err,token){
+        // localStorage.setItem("tokenid","res1.token");
+        res.json({
+            token
+        })
+        console.log("post request ");
+        console.log(token);
     })
 })
 
@@ -61,7 +93,7 @@ app.get('/register',function(req,res){
 
 
 app.post('/register',function(req,res){
-     res.send(req.body);
+    res.send(req.body);
     passwordDB.push(req.body.password);
     userDB.push(req.body.user);
     console.log(userDB);
@@ -69,6 +101,7 @@ app.post('/register',function(req,res){
 })
 
 
+// app.get('/:topic',verifyToken, function(req, res) {
 app.get('/:topic', function(req, res) {
     console.log(req.params.topic)
     if (routes.indexOf(req.url) !== -1){
@@ -99,6 +132,17 @@ app.get('/:topic', function(req, res) {
     }
 } )
 
+function verifyToken(req,res,next){
+    const bearerHeader = req.headers['authorization'];
+    if(typeof bearerHeader !== 'undefined'){
+        const bearer = bearerHeader.split(" ");
+        const bearerToken = bearer[1];
+        req.token = bearerToken;
+    }
+    else{
+        res.send('not authorized, need to login');
+    }
+}
 
 var server= app.listen(3000,function(){
     console.log('serving port',server.address().port);

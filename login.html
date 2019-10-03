@@ -5,16 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Authentication</title>
+    <script src="login.js"></script>
 </head>
 <body>
     
     <h1>Login </h1>
-    
+    <!-- <form action="/login" method="post"> -->
         <label for="user">userid:</label>
-        <input type="text" id="user"> 
+        <input type="text" name="user" id="user"> 
         <label for="password">password:</label>
-        <input type="text" id="password"> 
-        <button>Submit</button>
+        <input type="text" name="password" id="password"> 
+        <button onclick="request()">Submit</button> 
+      <!-- </form>  -->
    
 </body>
 </html>
