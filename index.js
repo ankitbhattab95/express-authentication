@@ -6,7 +6,7 @@ var app= express();
 var userDB= [];
 var passwordDB=[];
 
-var routes =['/movies','/sports','/politics','/date']
+var routes =['movies','sports','politics','date']
 
 var getDate = function (req, res, next) {
     req.timestamp = Date();
@@ -67,14 +67,21 @@ app.post('/login',function(req,res){
         user:req.body.user,
         password:req.body.password
     }
-    jwt.sign({userDetails},'secretKey',function(err,token){
-        // localStorage.setItem("tokenid","res1.token");
-        res.json({
-            token
+    //check if its a registered user
+    if(true){
+        jwt.sign({userDetails},'secretKey',function(err,token){
+            // localStorage.setItem("tokenid","res1.token");
+            res.json({
+                token
+            })
+            console.log("post request ");
+            console.log(token);
         })
-        console.log("post request ");
-        console.log(token);
-    })
+    }
+    else{
+        // console.log("not registered")
+        res.sendStatus(403);
+    }
 })
 
 app.get('/register',function(req,res){
@@ -100,51 +107,61 @@ app.post('/register',function(req,res){
     console.log(passwordDB);
 })
 
-
-// app.get('/:topic',verifyToken, function(req, res) {
 app.get('/:topic', function(req, res) {
-    console.log(req.params.topic)
-    if (routes.indexOf(req.url) !== -1){
-
-        if (req.params.topic==='date'){
-            var responseText = '<h4>The timestamp stored by the Middleware function (getDate) in the request</h4>'
-            responseText += req.timestamp 
-            res.send(responseText)  
-        }
-        else{
-            res.writeHead(200,{'Content-type':'text/html'})
-            file=req.params.topic+'.html'
-            fs.readFile(file,function(error,data){
-                if(error){
-                    res.writeHead(404)
-                    res.write('file not found')
+    console.log("/:topic")
+    // console.log(req.url)
+    // console.log(req.query.token)
+    if (routes.indexOf(req.params.topic) !== -1 && (req.query.token)!==undefined){
+            jwt.verify(req.query.token,'secretKey',function(err,authData){
+                if(err){
+                    res.sendStatus(403);
                 }
                 else{
-                    res.write(data)
+                    // console.log("finished");
+                    if (req.params.topic==='date'){
+                        var responseText = '<h4>The timestamp stored by the Middleware function (getDate) in the request</h4>'
+                        responseText += req.timestamp 
+                        res.send(responseText)  
+                    }
+                    else{
+                        res.writeHead(200,{'Content-type':'text/html'})
+                        file=req.params.topic+'.html'
+                        fs.readFile(file,function(error,data){
+                            if(error){
+                                res.writeHead(404)
+                                res.write('file not found')
+                            }
+                            else{
+                                res.end(data)
+                            }
+                            res.end();
+                        })
+                    }
                 }
-                res.end();
             })
-        }
 
     }
     else{
-        res.send("Page not found, check the URL");
+        res.send("not authorized!!!!");
     }
 } )
-
-function verifyToken(req,res,next){
-    const bearerHeader = req.headers['authorization'];
-    if(typeof bearerHeader !== 'undefined'){
-        const bearer = bearerHeader.split(" ");
-        const bearerToken = bearer[1];
-        req.token = bearerToken;
-    }
-    else{
-        res.send('not authorized, need to login');
-    }
-}
+// var req1;
+// function verifyToken(req,res,next){
+//     // const bearerHeader = req.headers['authorization'];
+//     // console.log(req.headers)
+//     // if(typeof bearerHeader !== 'undefined'){
+//     //     req1= bearerHeader;
+//     // }
+//     // else{
+//     //     res.send('not authorized, need to login');
+//     // }
+//     // console.log("in middleware");
+//     // console.log(req.query.token);
+//     req1=req.query.token;
+//     next();
+// }
 
 var server= app.listen(3000,function(){
     console.log('serving port',server.address().port);
-
 })
+
