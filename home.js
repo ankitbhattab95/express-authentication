@@ -1,55 +1,64 @@
 document.getElementById('sports').onclick = function() {
     page= this.innerText;
     buildKey();
-    console.log(page);
 };
 document.getElementById('movies').onclick = function() {
     page= this.innerText;
     buildKey();
-    console.log(page);
  };
  document.getElementById('politics').onclick = function() {
     page= this.innerText;
-    buildKey();
-    console.log(page);      
+    buildKey();     
  };
  
-function buildKey(){ 
+
+ document.getElementById('date').onclick = function() {
+    page= 'date';
+    buildKey();     
+ };
+
+
+ document.getElementById('logout').onclick = function() {
     var key = JSON.parse(localStorage.getItem("tokenID")); 
     console.log(key)
-    var url = "http://localhost:3000/"+page;
-    httpGet(url,key); 
-}
-
-
-
-
-
-function httpGet(url,key){
+    if(key !== null){
+        logout(key);   
+    }
+    else{
+        alert("you are not logged in");
+    }
+ };
+ 
+ 
+ function buildKey(){ 
+     var key = JSON.parse(localStorage.getItem("tokenID")); 
+     var url = "http://localhost:3000/"+page;
+     console.log(url)
+     if (key !==null){
+         window.location.href=(url+"?token="+key.token);
+     }
+     else{
+        window.location.href=(url);
+     }
+    }
+    
+    
+    
+function logout(key){
+    console.log("logout function")
+    console.log(key.token)
     var xhr = new XMLHttpRequest();
-    xhr.open("get", url, true);
+    xhr.open("post", 'http://localhost:3000/logout', true);
     xhr.setRequestHeader("authorization",key.token);
-    window.location.href=(url+"?token="+key.token);
-    // xhr.onreadystatechange = function() {
-    //     // console.log('in xhr '+ xhr.readyState)
-    //     if (xhr.readyState === 4)  { 
-    //         console.log("home.js get");
-    //         console.log(xhr.response);
-    //         var serverResponse = xhr.response;
-            
-    //     }
-    // };
-    // xhr.send(null);
-    // return xhr.responseText;
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status=== 200)  { 
+            localStorage.removeItem("tokenID");
+            window.location.href=('http://localhost:3000/logout');
+        }
+        else if(xhr.readyState === 4 ){
+            alert('login first')
+        }
+}
+    xhr.send(null)
 }
 
-
-
-
-// function httpGet(url,key){
-//     var xmlHttp = new XMLHttpRequest();
-//     xmlHttp.open( "GET", url, false );
-//     xmlHttp.setRequestHeader("Ocp-Apim-Subscription-Key",key);
-//     xmlHttp.send(null);
-//     return xmlHttp.responseText;
-// }

@@ -1,0 +1,22 @@
+body{
+    background-color: rgb(255, 255, 255);
+    margin-left: 50px;
+}
+h2{
+    padding-top : 50px;
+    text-decoration: underline;
+}
+li,a {
+    text-decoration: none;
+    color:black;
+}
+div li{
+    display: inline;
+}
+li:hover,#date:hover{
+    cursor: pointer;
+    color:rgb(143, 28, 231)
+}
+p{
+    width:400px;
+}
